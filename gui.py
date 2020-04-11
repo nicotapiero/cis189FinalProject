@@ -2,6 +2,9 @@ import tkinter
 from tkinter import messagebox
 from tkinter import *
 
+
+from solver_phase import *
+
 win = Tk()
 
 top = Frame(win, borderwidth=2, relief="solid")
@@ -31,6 +34,8 @@ def cont():
     else:
         top.pack_forget()
         bottom.pack_forget()
+
+        solver_phase([9], win)
         return
 
     messagebox.showerror("Error","All boxes must have numbers separated by commas to represent a clause")
@@ -56,6 +61,36 @@ button.pack()
 
 
 win.title("PennSAT Visualizer")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 win.mainloop()
+
 
 
