@@ -20,22 +20,42 @@ for entry in entries:
 
 def cont():
     #print(w.get())
+    array = []
+    biggest_num = 1
     for entry in entries:
         nums = entry.get().split(',')
         bigbreak = False
         print(nums)
+        smaller_array = []
         for num in nums:
             num = num.lstrip().strip()
-            if (not str.isdigit(num)) or num == '':
+
+            try:
+                my_int = int(num)
+                smaller_array.append(my_int)
+                if abs(my_int) > biggest_num:
+                    biggest_num = abs(my_int)
+            except:
                 bigbreak = True
                 break
+            # if (not str.isdigit(num)) or num == '':
+            #     bigbreak = True
+            #     break
         if bigbreak:
             break
+        else:
+            array.append(smaller_array)
     else:
         top.pack_forget()
         bottom.pack_forget()
 
-        solver_phase([9], win)
+        maxnum = 1
+        # for entry in entries:
+        #     nums = entry.get().split(',')
+        #     print(nums)
+        print(array)
+
+        solver_phase(biggest_num, array, win)
         return
 
     messagebox.showerror("Error","All boxes must have numbers separated by commas to represent a clause")
@@ -91,6 +111,3 @@ win.title("PennSAT Visualizer")
 
 
 win.mainloop()
-
-
-
