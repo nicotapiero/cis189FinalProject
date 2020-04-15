@@ -41,14 +41,16 @@ def solver_phase(max, cnf, win):
     print(max, cnf)
     solver = PennSAT(max, cnf, True)
 
-    text.set(str(solver.assignment_stack))
-    label = Label(top_left,textvariable=text)
-    label.pack()
+
 
     # label.pack()
 
     ass_stack_label = Label(top_left, text="Assignment Stack Stff")
     ass_stack_label.pack()
+
+    text.set(str(solver.assignment_stack))
+    label = Label(top_left,textvariable=text)
+    label.pack()
 
     tree_label = Label(bottom_left, text="Tree Stuff")
     tree_label.pack()
