@@ -1,3 +1,4 @@
+import tkinter
 from collections import deque
 from itertools import groupby
 from typing import List, Union, Optional
@@ -11,9 +12,9 @@ Assignment = List[Optional[bool]]
 
 # FOR DEBUGGING:
 # Replace this with a CNF that breaks your solver (don't forget to change n)
-n = 4
+#n = 4
 #cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
-cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
+#cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
 
 
 def preprocess(cnf: CNF) -> CNF:
@@ -41,7 +42,7 @@ def bsign(literal: Lit, value: bool) -> Optional[bool]:
     return None if value is None else value if literal > 0 else not value
 
 
-class PennSAT():
+class IterativePennSAT():
     """A DPLL-based SAT solver with 2 watched literals and a static activity decision heuristic."""
 
     def __init__(self, n: int, cnf: CNF, activity_heuristic: bool = True):
@@ -63,15 +64,13 @@ class PennSAT():
         # A queue of literals which have been assumed `False`
         self.propagation_queue: deque = deque()
         # A switch for processive DPLL
-        self.switch = False
+        self.decision = 0
+        self.next = 1
+        self.in_loop = 1
+        self.sat = []
 
-        # Fill in here: make each clause watch its first two literals
-        # for i in range(len(self.cnf)):
-        #     clauses_watching[i].append(self.cnf[i][0])
-        #     if (len(clauses_watching[i])) == 1:
-        #         break
-        #     else:
-        #         clauses_watching[i].append(self.cnf[i][1])
+
+        # initialize clauses watching
         for claws in self.cnf:
             self.clauses_watching[claws[0]].append(claws)
             if (len(claws) == 1):
@@ -79,10 +78,11 @@ class PennSAT():
             else:
                 self.clauses_watching[claws[1]].append(claws)
 
+    def next(func, args):
+        func(*args)
+
     def value(self, literal: Lit) -> Optional[bool]:
         """Returns the value of the literal (`True`/`False`/`None`) under the current assignment."""
-        # Fill in your implementation here
-        # Try to implement it in one line using bsign!
         return bsign(literal, self.assignment_stack[-1][abs(literal)])
 
     def assume(self, literal: Lit) -> bool:
@@ -90,7 +90,6 @@ class PennSAT():
         propagation queue. Returns False if the literal was already assigned to `False`;
         otherwise returns True."""
         print("assuming " + str(literal))
-        # Fill in your implementation here
         if self.value(literal) is False:
             print(str(literal) + " was false")
             return False
@@ -100,7 +99,7 @@ class PennSAT():
         else:
             self.assignment_stack[-1][abs(literal)] = bsign(literal, True)
             self.propagation_queue.append(literal * -1)
-            print(str(literal) + " was unassigned")
+            print(str(literal) + " was unassigned, " + str(-1 * literal) + " added to propogation queue")
             return True
 
     def compute_activity_ordering(self) -> List[Var]:
@@ -192,6 +191,7 @@ class PennSAT():
         """Undo the last decision and restore the previous partial assignment.
         Then assume the negation of the last decision variable."""
         # Fill in your implementation here
+        print("backtrack and assume negation")
         self.assignment_stack.pop()
         self.propagation_queue = deque()
         if not self.decision_stack: return
@@ -202,38 +202,63 @@ class PennSAT():
     def solve(self) -> Union[str, List[Lit]]:
         """Return a satisfying assignment to the stored CNF, or return `'UNSAT'` if none exists."""
         # Fill in your implementation here
-        for clause in self.cnf:
-            if len(clause) == 1:
-                print("found unit clause: " + str(clause[0]))
-                if self.assume(clause[0]) is False:
-                    return "UNSAT"
+        if self.next == 1:
+            print("checking for unit clauses")
+            for clause in self.cnf:
+                if len(clause) == 1:
+                    print("found unit clause: " + str(clause[0]))
+                    if self.assume(clause[0]) is False:
+                        return "UNSAT"
+            self.switch = -1
+            self.next = 2
+            return
 
         # for assignment in self.assignment_stack[-1]:
 
-        if not self.unit_propagate():
-            return 'UNSAT'
+        if self.next == 2:
+            if not self.unit_propagate():
+                return 'UNSAT'
+            self.switch = -1
+            self.next = 3
+            return
 
-        while True:
-            decision = self.pick_variable()
-            if decision is None:
-                print("all variables are assigned")
-                break
-            print("picked variable " + str(decision) + ", appending to decision stack")
-            self.decision_stack.append(decision)
-            new_assignment = self.assignment_stack[-1].copy()
-            self.assignment_stack.append(new_assignment)
-            
-            self.assume(decision)
+        if self.next == 3:
+            while True:
+                if self.in_loop == 1:
+                    self.decision = self.pick_variable()
+                    if self.decision is None:
+                        print("all variables are assigned")
+                        break
+                    print("picked variable " + str(self.decision) + ", appending to decision stack")
+                    self.decision_stack.append(self.decision)
+                    new_assignment = self.assignment_stack[-1].copy()
+                    print(new_assignment)
+                    self.assignment_stack.append(new_assignment)
+                    self.in_loop = 2
+                    self.switch = -1
+                    return
 
-            while not self.unit_propagate():
-                print("backtrack and assume negation")
-                self.backtrack_and_assume_negation()
-                if len(self.assignment_stack) == 0:
-                    return 'UNSAT'
+                if self.in_loop == 2:
+                    self.assume(self.decision)
+                    self.in_loop = 3
+                    self.switch = -1
+                    print("here")
+                    return
 
-            # yield False
-
-        return [lit(x, self.value(x)) for x in range(1, self.n + 1)]
+                if self.in_loop == 3:
+                    print("here again")
+                    if not self.unit_propagate():
+                        print("in loop 3")
+                        self.backtrack_and_assume_negation()
+                        if len(self.assignment_stack) == 0:
+                            return 'UNSAT'
+                        return
+                    self.in_loop = 1
+                    return
+            self.sat = [lit(x, self.value(x)) for x in range(1, self.n + 1)]
+            return "SAT"
+        
+        
 
     def start(self):
         for clause in self.cnf:
@@ -243,5 +268,13 @@ class PennSAT():
         return "not yet"
 
 
-solver = PennSAT(n, cnf, True)
-print(solver.solve())
+# solver = IterativePennSAT(n, cnf, True)
+# x = solver.solve()
+# while not (x == "UNSAT" or x == "SAT"):
+#     x = solver.solve()
+# print(x + ", satisfying assignment: " + str(solver.sat))
+
+
+
+
+

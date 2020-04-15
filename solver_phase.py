@@ -45,7 +45,7 @@ def solver_phase(max, cnf, win):
 
     # label.pack()
 
-    ass_stack_label = Label(top_left, text="Assignment Stack Stff")
+    ass_stack_label = Label(top_left, text="Assignment Stack Stuff")
     ass_stack_label.pack()
 
     text.set(str(solver.assignment_stack))
