@@ -69,6 +69,10 @@ class IterativePennSAT():
         self.in_loop = 1
         self.sat = []
 
+        self.check_all_set = False
+        self.check_unit_prop = False
+        self.check_level_0 = False
+
 
         # initialize clauses watching
         for claws in self.cnf:
@@ -211,7 +215,7 @@ class IterativePennSAT():
                         return "UNSAT"
             self.switch = -1
             self.next = 2
-            return
+            return 'image1'
 
         # for assignment in self.assignment_stack[-1]:
 
@@ -220,9 +224,26 @@ class IterativePennSAT():
                 return 'UNSAT'
             self.switch = -1
             self.next = 3
-            return
+            self.check_all_set = True
+            # return 'image2'
+
+        # just checked if all set, not going to
+        if self.check_all_set:
+            self.check_all_set = False
+            local_sat = self.assignment_stack[-1]
+            print(local_sat, 'hey peter')
+            for var in local_sat[1:]:
+                if var is None:
+                    break
+            else:
+                return 'SAT'
+            return 'image3'
 
         if self.next == 3:
+            if (self.switch == 1) :
+                self.switch = -1
+                return 'image4'
+
             while True:
                 if self.in_loop == 1:
                     self.decision = self.pick_variable()
@@ -236,29 +257,70 @@ class IterativePennSAT():
                     self.assignment_stack.append(new_assignment)
                     self.in_loop = 2
                     self.switch = -1
-                    return
+
+                    # local_sat = [lit(x, self.value(x)) for x in range(1, self.n + 1)]
+                    # print(local_sat, 'hey peter2')
+                    # for var in local_sat[1:]:
+                    #     if var is None or var < 0:
+                    #         break
+                    # else:
+                    #     self.check_all_set = True
+
+                    #return
 
                 if self.in_loop == 2:
                     self.assume(self.decision)
                     self.in_loop = 3
                     self.switch = -1
                     print("here")
-                    return
+                    return 'image4'
 
                 if self.in_loop == 3:
                     print("here again")
-                    if not self.unit_propagate():
-                        print("in loop 3")
-                        self.backtrack_and_assume_negation()
-                        if len(self.assignment_stack) == 0:
-                            return 'UNSAT'
-                        return
-                    self.in_loop = 1
-                    return
+                    if not self.check_unit_prop:
+                        # if not self.check_level_0:
+                        #     self.check_level_0 = True
+                        if not self.unit_propagate():
+                            self.check_unit_prop = True
+                            return 'image5'
+                        else:
+                            self.in_loop = 1
+                            self.check_all_set = True
+                            return 'image2'
+                                # print("in loop 3")
+                                # self.backtrack_and_assume_negation()
+                                # if len(self.assignment_stack) == 0:
+                                #     return 'UNSAT'
+                                # else:
+                                #     print('what???')
+                                #     return 'image5'
+                    else:
+                        if not self.check_level_0:
+                            if len(self.assignment_stack) == 0:
+                                return 'UNSAT'
+                            else:
+                                print('what???')
+                                return 'image5'
+                        else:
+                            self.check_level_0 = False
+                            print('hi Joe Swanson')
+                            self.in_loop = 1
+                            return 'image4'
+                    # else:
+                    #     self.check_unit_prop = False
+                    #
+                    #     print('please?')
+                    #     self.in_loop = 1
+                    #
+                    #     self.switch = 1
+                    #     self.in_loop = 1
+                    #     self.check_all_set = True
+                    #     print('Family guy is epic')
+                    #     return 'image3'
             self.sat = [lit(x, self.value(x)) for x in range(1, self.n + 1)]
             return "SAT"
-        
-        
+
+
 
     def start(self):
         for clause in self.cnf:
@@ -273,8 +335,3 @@ class IterativePennSAT():
 # while not (x == "UNSAT" or x == "SAT"):
 #     x = solver.solve()
 # print(x + ", satisfying assignment: " + str(solver.sat))
-
-
-
-
-
