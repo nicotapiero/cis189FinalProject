@@ -82,9 +82,6 @@ class IterativePennSAT():
             else:
                 self.clauses_watching[claws[1]].append(claws)
 
-    def next(func, args):
-        func(*args)
-
     def value(self, literal: Lit) -> Optional[bool]:
         """Returns the value of the literal (`True`/`False`/`None`) under the current assignment."""
         return bsign(literal, self.assignment_stack[-1][abs(literal)])
