@@ -78,7 +78,7 @@ def solver_phase(max, cnf, win):
     # # # bottom_left
     # # # bottom_right
     # #
-    text = StringVar()
+    
     #
     #
     print(max, cnf)
@@ -91,6 +91,7 @@ def solver_phase(max, cnf, win):
     ass_stack_label = Label(top_left, text="Assignment Stack Stuff")
     ass_stack_label.pack()
 
+    text = StringVar()
     text.set('Level 0: ' + str(solver.assignment_stack[1:]) + '\n')
     label = Label(top_left,textvariable=text)
     label.pack()
@@ -131,7 +132,7 @@ def solver_phase(max, cnf, win):
     # i = 1
     # for clauses_list in solver.clauses_watching:
     #     string += f''
-    watching_text.set(f'Im watching {solver.clauses_watching}')
+    watching_text.set(f'Im watching {solver.clauses_watching[0]}')
     watching_label = Label(top_middle,textvariable=watching_text)
     watching_label.pack()
 
@@ -157,7 +158,7 @@ def solver_phase(max, cnf, win):
         solution = solver.solve()
 
         print('watchy', solver.clauses_watching)
-        watching_text.set(f'Im watching {solver.clauses_watching}')
+        watching_text.set(f'Im watching {solver.clauses_watching[0]}')
 
 
         print('FUK', f'switch: {solver.switch}, in_loop:{solver.in_loop}, next:{solver.next}, check_l0 {solver.check_level_0}, all_set {solver.check_all_set}, unit {solver.check_unit_prop}')

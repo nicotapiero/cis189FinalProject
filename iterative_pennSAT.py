@@ -293,6 +293,7 @@ class IterativePennSAT():
                                 #     return 'image5'
                     else:
                         if not self.check_level_0:
+                            self.check_level_0 = True
                             if len(self.assignment_stack) == 0:
                                 return 'UNSAT'
                             else:
