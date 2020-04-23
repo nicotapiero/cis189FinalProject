@@ -237,3 +237,5 @@ def solver_phase(max, cnf, win):
     control_label.pack()
     button = Button(bottom_right, text="start", command=start)
     button.pack()
+
+

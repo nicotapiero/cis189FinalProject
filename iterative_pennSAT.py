@@ -72,6 +72,7 @@ class IterativePennSAT():
         self.check_all_set = False
         self.check_unit_prop = False
         self.check_level_0 = False
+        self.skip_this = False
 
 
         # initialize clauses watching
@@ -246,6 +247,8 @@ class IterativePennSAT():
                     self.decision = self.pick_variable()
                     if self.decision is None:
                         print("all variables are assigned")
+                        self.check_all_set = True
+                        return 'image2'
                         break
                     print("picked variable " + str(self.decision) + ", appending to decision stack")
                     self.decision_stack.append(self.decision)
@@ -270,7 +273,9 @@ class IterativePennSAT():
                     self.in_loop = 3
                     self.switch = -1
                     print("here")
-                    return 'image4'
+                    if not (self.skip_this):
+                        self.skip_this = True
+                        return 'image4'
 
                 if self.in_loop == 3:
                     print("here again")
@@ -298,11 +303,13 @@ class IterativePennSAT():
                                 return 'UNSAT'
                             else:
                                 print('what???')
-                                return 'image5'
+                                return 'image6'
                         else:
                             self.check_level_0 = False
                             print('hi Joe Swanson')
                             self.in_loop = 1
+                            #self.switch = -1
+                            self.check_unit_prop = False
                             return 'image4'
                     # else:
                     #     self.check_unit_prop = False
