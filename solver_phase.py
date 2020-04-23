@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 
 from iterative_pennSAT import IterativePennSAT
 
-from tree import display_tree
+from tree import draw_tree
 
 
 # https://stackoverflow.com/questions/46522200/how-to-make-two-split-up-screen-canvas-inside-the-python-tkinter-window
@@ -61,20 +61,32 @@ def solver_phase(max, cnf, win):
     # bottom_left = Frame(win, width=500, height=150, background="green").pack(fill="both", expand=True, padx=20, pady=20)
     # bottom_right = Frame(win, width=500, height=150, background="yellow").pack(fill="both", expand=True, padx=20, pady=20)
 
-    top_left = Frame(win, width=500, height=150, background="red")
-    top_left.grid(row=0, column=0)
-    top_right = Frame(win, width=500, height=150, background="blue")
-    top_right.grid(row=0, column=2)
+    left = Frame(win, width=500, height = 400, background="white")
+    left.grid(row=0, column=0)
 
-    top_middle = Frame(win, width=500, height=150, background="blue")
-    top_middle.grid(row=0, column=1)
-    bottom_middle = Frame(win, width=500, height=150, background="blue")
-    bottom_middle.grid(row=1, column=1)
+    middle = Frame(win, width=500, height = 400, background="white")
+    middle.grid(row=0, column=1)
 
-    bottom_left = Frame(win, width=500, height=150, background="green")
-    bottom_left.grid(row=1, column=0)
-    bottom_right = Frame(win, width=500, height=150, background="yellow")
-    bottom_right.grid(row=1, column=2)
+    right = Frame(win, width=500, height = 400, background="white")
+    right.grid(row=0, column=2)
+
+
+    top_left = Frame(left, width=500, height=200, background="red")
+    top_left.grid(row=0, column = 0)
+    
+    top_right = Frame(right, width=500, height=200, background="blue")
+    top_right.pack()
+
+    # top_middle = Frame(, width=500, height=150, background="blue")
+    # top_middle.grid(row=0, column=1)
+    # bottom_middle = Frame(win, width=500, height=150, background="blue")
+    # bottom_middle.grid(row=1, column=1)
+
+    bottom_left = Frame(left, width=500, height=200, background="green")
+    bottom_left.grid(row=1, column = 0)
+
+    bottom_right = Frame(right, width=500, height=200, background="yellow")
+    bottom_right.pack()
     # #
     # # # top_left
     # # # top_right
@@ -99,7 +111,7 @@ def solver_phase(max, cnf, win):
     label = Label(top_left,textvariable=text)
     label.pack()
 
-    tree_label = Label(bottom_left, text="Tree Stuff")
+    tree_label = Label(middle, text="Tree Stuff")
     tree_label.pack()
     
 
@@ -107,16 +119,15 @@ def solver_phase(max, cnf, win):
     decision_stack_text = StringVar()
     decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
     decisions_label = Label(bottom_left,textvariable=decision_stack_text)
-    decisions_label.pack()
+    decisions_label.pack(side=TOP)
 
-    tree_canvas = Canvas(bottom_left, width = 400, height = 400,bg="white")
+    tree_canvas = Canvas(middle, width = 500, height = 400,bg="snow2")
     tree_canvas.pack()
 
     
 
 
-    cnf_label = Label(bottom_middle, text=f"CNF:{solver.cnf}\n Var Ordering {solver.var_ordering}")
-    cnf_label.pack()
+    
 
 
     flowchart_label = Label(top_right, text="Flowchart")
@@ -156,12 +167,12 @@ def solver_phase(max, cnf, win):
 
     #watching_text.set(f'Im watching {solver.clauses_watching[0]}')
     watching_text.set(watchy_string)
-    watching_label = Label(top_middle,textvariable=watching_text)
+    watching_label = Label(bottom_left,textvariable=watching_text)
     watching_label.pack()
 
     UP_text = StringVar()
     UP_text.set(f'Propagation Queue: {solver.propagation_queue}')
-    UP_label = Label(top_middle,textvariable=UP_text)
+    UP_label = Label(bottom_left,textvariable=UP_text)
     UP_label.pack()
 
 
@@ -198,7 +209,9 @@ def solver_phase(max, cnf, win):
         # print('watchy', solver.clauses_watching)
         # watching_text.set(f'Im watching {solver.clauses_watching[0]}')
 
-        display_tree(tree_canvas, solver.assignment_stack, solver.decision_stack, solver.var_ordering, 400, 400)
+        # display_tree(tree_canvas, solver.assignment_stack, solver.decision_stack, solver.var_ordering, 500, 400)
+
+        draw_tree(tree_canvas, solver.tree_info, solver.curr_direction, 500, 400, solver.curr_child)
 
         decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
 
@@ -278,7 +291,15 @@ def solver_phase(max, cnf, win):
 
     control_label = Label(bottom_right, text="Controls")
     control_label.pack()
+
+    
+
     button = Button(bottom_right, text="start", command=start)
     button.pack()
+
+    cnf_label = Label(bottom_right, text=f"\n\nCNF:{solver.cnf}\n Var Ordering {solver.var_ordering}\n\n")
+    cnf_label.pack()
+
+    
 
 

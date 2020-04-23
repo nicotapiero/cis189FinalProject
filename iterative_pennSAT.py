@@ -12,10 +12,20 @@ Assignment = List[Optional[bool]]
 
 # FOR DEBUGGING:
 # Replace this with a CNF that breaks your solver (don't forget to change n)
-#n = 4
-#cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
+# n = 4
+# cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
+
+n = 3
+cnf =[[-3],[-3,2]]
 #cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
 
+
+class Node:
+    def __init__(self, text):
+        self.left = None
+        self.right = None
+        self.decision_var = 0
+        self.text = text
 
 def preprocess(cnf: CNF) -> CNF:
     """Remove duplicate literals and clauses from a CNF formula."""
@@ -74,6 +84,12 @@ class IterativePennSAT():
         self.check_level_0 = False
         self.skip_this = False
 
+        root= Node('root')
+        self.tree_info = root
+        self.curr_child = root
+        self.last_decision = root
+        self.curr_direction = None
+
 
         # initialize clauses watching
         for claws in self.cnf:
@@ -94,11 +110,44 @@ class IterativePennSAT():
         print("assuming " + str(literal))
         if self.value(literal) is False:
             print(str(literal) + " was false")
+            if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
+
+                new_node = Node('UP')
+                new_node.decision_var = literal
+                if (self.curr_direction == 'Right'):
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+                self.curr_child = new_node
+            self.curr_direction = 'Right'
+
             return False
         elif self.value(literal) is True:
             print(str(literal) + " was true")
+
+            if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
+                new_node = Node('UP')
+                new_node.decision_var = literal
+                if (self.curr_direction == 'Right'):
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+                self.curr_child = new_node
+            self.curr_direction = 'Left'
+
             return True
         else:
+            
+            if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
+                new_node = Node('UP')
+                new_node.decision_var = literal
+                if (self.curr_direction == 'Right'):
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+                self.curr_child = new_node
+            self.curr_direction = 'Left'
+
             self.assignment_stack[-1][abs(literal)] = bsign(literal, True)
             self.propagation_queue.append(literal * -1)
             print(str(literal) + " was unassigned, " + str(-1 * literal) + " added to propogation queue")
@@ -133,6 +182,19 @@ class IterativePennSAT():
         for i in range(len(self.var_ordering)):
             index = self.var_ordering[i]
             if self.assignment_stack[-1][index] is None:
+                new_node = Node('Decision')
+                new_node.decision_var = index
+                if self.curr_direction == "Right":
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+
+                self.curr_child = new_node
+                self.last_decision = new_node
+
+                self.curr_direction = None
+
+
                 return index
         return None
 
@@ -186,7 +248,40 @@ class IterativePennSAT():
         while self.propagation_queue:
             literal = self.propagation_queue.popleft()
             if (self.propagate_from(literal) is False):
+                new_node = Node('CONFLICT')
+                if self.curr_direction == 'Right':
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+                self.curr_child = new_node
+
                 return False
+            
+            # else:
+            # if not abs(self.last_decision.decision_var) == abs(literal):
+
+
+            new_node = Node('UP')
+            new_node.decision_var = literal
+            if self.curr_direction == 'Right':
+                self.curr_child.right = new_node
+            else:
+                self.curr_child.left = new_node
+            
+            # if self.value(literal):
+            #     self.curr_direction = 'Left'
+            # else:
+            if literal < 0:
+                self.curr_direction = "Right"
+            else:
+                self.curr_direction = "Left"
+            
+            self.curr_child = new_node
+
+            # if (self.propagate_from(literal) is False):
+            #     return False
+
+
         return True
 
     def backtrack_and_assume_negation(self) -> None:
@@ -199,6 +294,22 @@ class IterativePennSAT():
         if not self.decision_stack: return
         last_decision = self.decision_stack.pop()
         self.assume(-1 * last_decision)
+
+        if self.curr_direction == 'Right':
+            self.curr_direction == 'Left'
+        elif self.curr_direction == 'Left':
+            self.curr_direction == 'Right'
+
+        if self.last_decision.right is not None:
+            self.curr_direction = 'Left'
+        elif self.last_decision.left is not None:
+            self.curr_direction = 'Right'
+        # new_node = Node(6,'undid last decision')
+        # self.last_decision.right = new_node
+        
+        self.curr_child = self.last_decision
+
+
         return
 
     def solve(self) -> Union[str, List[Lit]]:
@@ -211,9 +322,24 @@ class IterativePennSAT():
                     print("found unit clause: " + str(clause[0]))
                     if self.assume(clause[0]) is False:
                         return "UNSAT"
+
+                    new_node = Node('initial UP')
+                    new_node.decision_var = clause[0]
+                    if self.curr_direction == 'Right':
+                        self.curr_child.right = new_node
+                    else:
+                        self.curr_child.left = new_node
+
+                    if clause[0] < 0:
+                        self.curr_direction = 'Right'
+                    else:
+                        self.curr_direction = 'Left'
+                    self.curr_child = new_node
+                    
+                    
             self.switch = -1
             self.next = 2
-            return 'image1'
+            #return 'image1'
 
         # for assignment in self.assignment_stack[-1]:
 
@@ -223,6 +349,7 @@ class IterativePennSAT():
             self.switch = -1
             self.next = 3
             self.check_all_set = True
+            return 'image1'
             # return 'image2'
 
         # just checked if all set, not going to
@@ -230,8 +357,9 @@ class IterativePennSAT():
             self.check_all_set = False
             local_sat = self.assignment_stack[-1]
             print(local_sat, 'hey peter')
-            for index, var in enumerate(local_sat[1:]):
-                if var is None and index in self.var_ordering and index != 0:
+            for index, var in enumerate(local_sat):
+                print(index, var, index in self.var_ordering, 'FFUCK\n\n\n')
+                if index != 0 and var is None and index in self.var_ordering:
                     print(var, "AHHHHHHH\n\n\n\n")
                     break
             else:
@@ -254,6 +382,8 @@ class IterativePennSAT():
                         #self.switch = 1
                         return 'image2'
                         break
+                    # else:
+                    #     self.tree_info.append((self.decision, self.parent, self.))
                     print("picked variable " + str(self.decision) + ", appending to decision stack")
                     self.decision_stack.append(self.decision)
                     new_assignment = self.assignment_stack[-1].copy()
@@ -303,6 +433,7 @@ class IterativePennSAT():
                                 #     return 'image5'
                     else:
                         if not self.check_level_0:
+                            
                             self.check_level_0 = True
                             if len(self.assignment_stack) == 1:
                                 return 'UNSAT'
@@ -316,8 +447,8 @@ class IterativePennSAT():
                             #self.switch = -1
                             self.check_unit_prop = False
 
+                            
                             self.backtrack_and_assume_negation()
-
 
                             return 'image4'
                     # else:
@@ -344,8 +475,9 @@ class IterativePennSAT():
         return "not yet"
 
 
-# solver = IterativePennSAT(n, cnf, True)
-# x = solver.solve()
-# while not (x == "UNSAT" or x == "SAT"):
-#     x = solver.solve()
-# print(x + ", satisfying assignment: " + str(solver.sat))
+solver = IterativePennSAT(n, cnf, True)
+x = solver.solve()
+while not (x == "UNSAT" or x == "SAT"):
+    x = solver.solve()
+print(x + ", satisfying assignment: " + str(solver.sat))
+

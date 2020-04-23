@@ -5,6 +5,32 @@ from tkinter import *
 
 from solver_phase import *
 
+from random import random
+
+def R(n, m):
+    """Generate a random formula in the family R(n,m), with no empty clauses."""
+    # Fill in here
+    cnf = []
+    for j in range(m):
+        clause = []
+        for i in range(1, n+1):
+            rng = random()
+            if rng < (1/3):
+                clause.append(i)
+            elif rng < (2/3):
+                clause.append(-1 * i)
+        if (len(clause) > 0):
+            cnf.append(clause)
+
+    return cnf
+
+random_cnf = R(3, 4)
+
+def generate_cnf():
+    random_cnf = R(3,4)
+    cnf.set(str(random_cnf))
+    return
+
 win = Tk()
 
 top = Frame(win, borderwidth=2, relief="solid")
@@ -53,7 +79,7 @@ def cont():
         # for entry in entries:
         #     nums = entry.get().split(',')
         #     print(nums)
-        print(array)
+        print(array, 'array')
 
         solver_phase(biggest_num, array, win)
         return
@@ -83,34 +109,31 @@ button.pack()
 button = Button(bottom, text="Submit Formula", command=cont)
 button.pack()
 
+blank_label = Label(bottom, text="\n\n")
+blank_label.pack()
+
+button = Button(bottom, text='Generate Random CNF', command=generate_cnf)
+button.pack()
+
+cnf = StringVar()
+cnf.set(str(random_cnf))
+blank_label = Label(bottom, textvariable=cnf)
+blank_label.pack()
+
+def submit_random():
+    maxes = [max(max(clause), abs(min(clause))) for clause in random_cnf]
+    big_num = max(maxes)
+    top.pack_forget()
+    bottom.pack_forget()
+    #print(maxes, big_num, random_cnf)
+    solver_phase(big_num, random_cnf, win)
+    return
+
+button = Button(bottom, text='Use random CNF', command=submit_random)
+button.pack()
+
 
 win.title("PennSAT Visualizer")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
