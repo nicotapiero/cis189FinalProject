@@ -152,6 +152,11 @@ def solver_phase(max, cnf, win):
     watching_label = Label(top_middle,textvariable=watching_text)
     watching_label.pack()
 
+    UP_text = StringVar()
+    UP_text.set(f'Propagation Queue: {solver.propagation_queue}')
+    UP_label = Label(top_middle,textvariable=UP_text)
+    UP_label.pack()
+
 
     # load = Image.open("brian.png")
     # load.resize((50, 50), Image.ANTIALIAS)
@@ -180,6 +185,7 @@ def solver_phase(max, cnf, win):
 
         decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
 
+        UP_text.set(f'Propagation Queue: {solver.propagation_queue}')
 
         print('FUK', f'switch: {solver.switch}, in_loop:{solver.in_loop}, next:{solver.next}, check_l0 {solver.check_level_0}, all_set {solver.check_all_set}, unit {solver.check_unit_prop}')
         print('--------------\n', solution, '--------------\n')

@@ -25,28 +25,35 @@ printed = []
 def get_to_print(assignment_stack, decision_stack, var_ordering):
     counter = 0
     get_to_print = []
+    nums_added = []
 
     for index, layer in enumerate(assignment_stack):
 
-        if counter < len(decision_stack) and layer[decision_stack[counter]] is not None:
+        if counter < len(decision_stack) and layer[decision_stack[counter]] is not None and decision_stack[counter] not in nums_added:
+            nums_added.append(decision_stack[counter])
             get_to_print.append((decision_stack[counter], not layer[decision_stack[counter]], " (decision)"))
             counter+=1
         for var_no, variable in enumerate(layer):
             if variable is not None:
-                if variable in decision_stack:
+                if var_no in decision_stack or var_no in nums_added:
                     continue
                 if index == 0:
-                    get_to_print.append(var_no, not variable, " (initial UP)")
+                    get_to_print.append((var_no, not variable, " (initial UP)"))
+                    nums_added.append(var_no)
                 else:
-                    get_to_print.append(var_no, not variable, " (UP)")
+                    get_to_print.append((var_no, not variable, " (UP)"))
+                    nums_added.append(var_no)
 
     # if get_to_print == []:
     #     get_to_print.append((var_ordering[0], None, " (first in var ordering)"))
     for item in var_ordering:
-        for (var_no, variable, text) in get_to_print:
-            if item == var_no:
-                break
-        else:
+        # for (var_no, variable, text) in get_to_print:
+        #     if item == var_no:
+        #         break
+        # else:
+        #     get_to_print.append((item, None, " (next)"))
+        #     break
+        if item not in nums_added:
             get_to_print.append((item, None, " (next)"))
             break
 

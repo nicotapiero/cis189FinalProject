@@ -302,7 +302,7 @@ class IterativePennSAT():
                     else:
                         if not self.check_level_0:
                             self.check_level_0 = True
-                            if len(self.assignment_stack) == 0:
+                            if len(self.assignment_stack) == 1:
                                 return 'UNSAT'
                             else:
                                 print('what???')
@@ -310,9 +310,13 @@ class IterativePennSAT():
                         else:
                             self.check_level_0 = False
                             print('hi Joe Swanson')
-                            self.in_loop = 1
+                            self.in_loop = 2
                             #self.switch = -1
                             self.check_unit_prop = False
+
+                            self.backtrack_and_assume_negation()
+
+
                             return 'image4'
                     # else:
                     #     self.check_unit_prop = False

@@ -12,8 +12,8 @@ Assignment = List[Optional[bool]]
 # FOR DEBUGGING:
 # Replace this with a CNF that breaks your solver (don't forget to change n)
 n = 4
-#cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
-cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
+cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
+#cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
 
 
 def preprocess(cnf: CNF) -> CNF:
