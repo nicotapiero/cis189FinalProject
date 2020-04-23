@@ -240,6 +240,7 @@ class IterativePennSAT():
         if self.next == 3:
             if (self.switch == 1) :
                 self.switch = -1
+                print('fricken stall')
                 return 'image4'
 
             while True:
@@ -248,6 +249,7 @@ class IterativePennSAT():
                     if self.decision is None:
                         print("all variables are assigned")
                         self.check_all_set = True
+                        #self.switch = 1
                         return 'image2'
                         break
                     print("picked variable " + str(self.decision) + ", appending to decision stack")
@@ -288,6 +290,7 @@ class IterativePennSAT():
                         else:
                             self.in_loop = 1
                             self.check_all_set = True
+                            self.skip_this = False
                             return 'image2'
                                 # print("in loop 3")
                                 # self.backtrack_and_assume_negation()

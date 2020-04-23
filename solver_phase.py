@@ -5,12 +5,15 @@ from PIL import Image, ImageTk
 
 from iterative_pennSAT import IterativePennSAT
 
+from tree import display_tree
+
 
 # https://stackoverflow.com/questions/46522200/how-to-make-two-split-up-screen-canvas-inside-the-python-tkinter-window
 
 #for
 
 flowchart_images = []
+
 
 def create_images():
     load = Image.open("flowchart copy.jpg")
@@ -98,6 +101,19 @@ def solver_phase(max, cnf, win):
 
     tree_label = Label(bottom_left, text="Tree Stuff")
     tree_label.pack()
+    
+
+
+    decision_stack_text = StringVar()
+    decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
+    decisions_label = Label(bottom_left,textvariable=decision_stack_text)
+    decisions_label.pack()
+
+    tree_canvas = Canvas(bottom_left, width = 200, height = 200,bg="white")
+    tree_canvas.pack()
+
+    
+
 
     cnf_label = Label(bottom_middle, text=f"CNF:{solver.cnf}\n Var Ordering {solver.var_ordering}")
     cnf_label.pack()
@@ -159,6 +175,10 @@ def solver_phase(max, cnf, win):
 
         print('watchy', solver.clauses_watching)
         watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+
+        display_tree(tree_canvas, solver.assignment_stack, solver.decision_stack, solver.var_ordering, 200, 200)
+
+        decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
 
 
         print('FUK', f'switch: {solver.switch}, in_loop:{solver.in_loop}, next:{solver.next}, check_l0 {solver.check_level_0}, all_set {solver.check_all_set}, unit {solver.check_unit_prop}')
