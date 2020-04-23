@@ -217,7 +217,7 @@ def solver_phase(max, cnf, win):
 
         UP_text.set(f'Propagation Queue: {solver.propagation_queue}')
 
-        print('FUK', f'switch: {solver.switch}, in_loop:{solver.in_loop}, next:{solver.next}, check_l0 {solver.check_level_0}, all_set {solver.check_all_set}, unit {solver.check_unit_prop}')
+        #print('FUK', f'switch: {solver.switch}, in_loop:{solver.in_loop}, next:{solver.next}, check_l0 {solver.check_level_0}, all_set {solver.check_all_set}, unit {solver.check_unit_prop}')
         print('--------------\n', solution, '--------------\n')
 
         if (solution == 'SAT'):

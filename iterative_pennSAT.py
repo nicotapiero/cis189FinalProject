@@ -112,7 +112,8 @@ class IterativePennSAT():
             print(str(literal) + " was false")
             if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
 
-                new_node = Node('UP')
+                #new_node = Node('UP')
+                new_node = Node('CONFLICT')
                 new_node.decision_var = literal
                 if (self.curr_direction == 'Right'):
                     self.curr_child.right = new_node

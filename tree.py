@@ -188,7 +188,10 @@ def draw_branch(canvas, node, x1, y1, length, curr_direction, curr_leaf):
         #return
         
     if node.left is not None:
-        draw_line(canvas, 4, x1, y1, x2_left,y2_left, False)
+        if node.left.text == 'CONFLICT':
+            canvas.create_line(x1,y1, x1, y1+length, tags = "line", fill='purple')  
+        else:
+            draw_line(canvas, 4, x1, y1, x2_left,y2_left, False)
     draw_branch(canvas, node.left, x2_left, y2_left, length, curr_direction, curr_leaf)
     if node.right is not None:
         if node.right.text == 'CONFLICT':
