@@ -145,10 +145,14 @@ def solver_phase(max, cnf, win):
     # l.pack()
     watching_text = StringVar()
     watchy_string = ''
-    i = 1
-    for clauses_list in solver.clauses_watching:
-        watchy_string += f'Clause {i} is watching {clauses_list}\n'
-        i+=1
+    #i = 1
+    for i in range(-solver.n, solver.n+1):
+        if len(solver.clauses_watching[i]) != 0:
+            watchy_string += f'Literal {i} is being watched by {solver.clauses_watching[i]}\n'
+    # for clauses_list in solver.clauses_watching:
+    #     if clauses
+    #     watchy_string += f'Clause {i} is watching {clauses_list}\n'
+    #     i+=1
 
     #watching_text.set(f'Im watching {solver.clauses_watching[0]}')
     watching_text.set(watchy_string)
@@ -182,9 +186,12 @@ def solver_phase(max, cnf, win):
         solution = solver.solve()
 
         watchy_string = ''
-        i = 1
-        for clauses_list in solver.clauses_watching:
-            watchy_string += f'Clause {i} is watching {clauses_list}\n'
+        # i = 1
+        # for clauses_list in solver.clauses_watching:
+        #     watchy_string += f'Clause {i} is watching {clauses_list}\n'
+        for i in range(-solver.n, solver.n+1):
+            if len(solver.clauses_watching[i]) != 0:
+                watchy_string += f'Literal {i} is being watched by {solver.clauses_watching[i]}\n'
 
         #watching_text.set(f'Im watching {solver.clauses_watching[0]}')
         watching_text.set(watchy_string)
