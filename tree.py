@@ -93,11 +93,11 @@ def display_tree(canvas, assignment_stack, decision_stack, var_ordering, width, 
     depth = len(to_print)-2
 
     if to_print[0][1] is True:
-        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/4, -math.pi/4, True)
+        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/5, -math.pi/4, True)
     elif to_print[0][1] is False:
-        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/4, math.pi + math.pi/4, False)
+        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/5, math.pi + math.pi/4, False)
     elif to_print[0][1] is None:
-        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/4, math.pi + math.pi/4, None)
+        paint_branch(canvas,  to_print[1:], depth, width/ 2, height/10, height/5, math.pi + math.pi/4, None)
 
 def paint_branch(canvas, to_print, depth, x1, y1, length, angle, is_left):
     x2 = x1 + int(math.cos(angle) * length)

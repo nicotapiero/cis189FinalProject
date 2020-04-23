@@ -11,8 +11,10 @@ Assignment = List[Optional[bool]]
 
 # FOR DEBUGGING:
 # Replace this with a CNF that breaks your solver (don't forget to change n)
-n = 4
-cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
+# n = 4
+# cnf = [[-1, -2], [-1, 2, 3], [-3, -4], [1, 2, 3], [-3], [1, -2], [2, -3], [1, -2, 3]]
+n = 3
+cnf = [[3], [2]]
 #cnf = [[-1, -2], [-1, 2, 3], [-3, -4]]
 
 
@@ -244,4 +246,7 @@ class PennSAT():
 
 
 solver = PennSAT(n, cnf, True)
+
 print(solver.solve())
+print(solver.cnf)
+print(solver.var_ordering)

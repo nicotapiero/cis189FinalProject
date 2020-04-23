@@ -109,7 +109,7 @@ def solver_phase(max, cnf, win):
     decisions_label = Label(bottom_left,textvariable=decision_stack_text)
     decisions_label.pack()
 
-    tree_canvas = Canvas(bottom_left, width = 200, height = 200,bg="white")
+    tree_canvas = Canvas(bottom_left, width = 400, height = 400,bg="white")
     tree_canvas.pack()
 
     
@@ -144,11 +144,14 @@ def solver_phase(max, cnf, win):
     # #l.image = photo
     # l.pack()
     watching_text = StringVar()
-    # watchy_string = ''
-    # i = 1
-    # for clauses_list in solver.clauses_watching:
-    #     string += f''
-    watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+    watchy_string = ''
+    i = 1
+    for clauses_list in solver.clauses_watching:
+        watchy_string += f'Clause {i} is watching {clauses_list}\n'
+        i+=1
+
+    #watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+    watching_text.set(watchy_string)
     watching_label = Label(top_middle,textvariable=watching_text)
     watching_label.pack()
 
@@ -178,10 +181,17 @@ def solver_phase(max, cnf, win):
 
         solution = solver.solve()
 
-        print('watchy', solver.clauses_watching)
-        watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+        watchy_string = ''
+        i = 1
+        for clauses_list in solver.clauses_watching:
+            watchy_string += f'Clause {i} is watching {clauses_list}\n'
 
-        display_tree(tree_canvas, solver.assignment_stack, solver.decision_stack, solver.var_ordering, 200, 200)
+        #watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+        watching_text.set(watchy_string)
+        # print('watchy', solver.clauses_watching)
+        # watching_text.set(f'Im watching {solver.clauses_watching[0]}')
+
+        display_tree(tree_canvas, solver.assignment_stack, solver.decision_stack, solver.var_ordering, 400, 400)
 
         decision_stack_text.set('Decision Stack: ' + str(solver.decision_stack) + '\n')
 
@@ -193,7 +203,7 @@ def solver_phase(max, cnf, win):
         if (solution == 'SAT'):
             button.pack_forget()
             img.configure(image=flowchart_images[6][1])
-            Label(bottom_right, text="SAT!").pack()
+            Label(bottom_right, text="SAT!\nAssignment:" + str(solver.sat)).pack()
             #Button(bottom_right, text="exit", command=).pack()
         elif (solution == 'UNSAT'):
             button.pack_forget()

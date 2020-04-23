@@ -66,9 +66,13 @@ def addThing():
     local_entry.pack()
 
 def removeThing():
-    local_entry = entries[-1]
-    local_entry.pack_forget()
-    entries.pop()
+    if len(entries) > 1:
+        local_entry = entries[-1]
+        local_entry.pack_forget()
+        entries.pop()
+    else:
+        messagebox.showerror("Error","You must have at least one clause, so you cannot remove the last box")
+
 
 button = Button(bottom, text="Add New Clause", command=addThing)
 button.pack()

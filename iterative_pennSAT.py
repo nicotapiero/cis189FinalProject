@@ -230,10 +230,12 @@ class IterativePennSAT():
             self.check_all_set = False
             local_sat = self.assignment_stack[-1]
             print(local_sat, 'hey peter')
-            for var in local_sat[1:]:
-                if var is None:
+            for index, var in enumerate(local_sat[1:]):
+                if var is None and index in self.var_ordering and index != 0:
+                    print(var, "AHHHHHHH\n\n\n\n")
                     break
             else:
+                self.sat = [lit(x, self.value(x)) for x in range(1, self.n + 1)]
                 return 'SAT'
             return 'image3'
 
