@@ -123,7 +123,7 @@ class IterativePennSAT():
                     self.curr_child.left = new_node
                 self.curr_child = new_node
             self.curr_direction = 'Right'
-            print('NICO LOOK AT ME 3', self.value(literal))
+            #print('NICO LOOK AT ME 3', self.value(literal))
 
             return False
         elif self.value(literal) is True:
@@ -142,7 +142,7 @@ class IterativePennSAT():
                     self.curr_child.left = new_node
                     
                 self.curr_child = new_node
-            print('NICO LOOK AT ME', self.value(literal))
+            #print('NICO LOOK AT ME', self.value(literal))
             self.curr_direction = 'Left'
 
             return True
@@ -162,7 +162,7 @@ class IterativePennSAT():
                 self.curr_child = new_node
             self.curr_direction = 'Left'
 
-            print('NICO LOOK AT ME 2', self.value(literal))
+            #print('NICO LOOK AT ME 2', self.value(literal))
 
             self.assignment_stack[-1][abs(literal)] = bsign(literal, True)
             self.propagation_queue.append(literal * -1)
@@ -404,7 +404,7 @@ class IterativePennSAT():
             local_sat = self.assignment_stack[-1]
             print(local_sat, 'hey peter')
             for index, var in enumerate(local_sat):
-                print(index, var, index in self.var_ordering, 'FFUCK\n\n\n')
+                #print(index, var, index in self.var_ordering, 'FFUCK\n\n\n')
                 if index != 0 and var is None and index in self.var_ordering:
                     print(var, "AHHHHHHH\n\n\n\n")
                     break

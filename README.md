@@ -1,8 +1,12 @@
 # cis189FinalProject
 
 Installation:
-python3 -m pip install Pillow
+```sh
+$ python3 -m pip install Pillow
 //maybe install tkinter?
+```
 
 To Run:
-python3 gui.py
+```sh
+$ python3 gui.py
+```
