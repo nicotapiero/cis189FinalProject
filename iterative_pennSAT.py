@@ -90,6 +90,8 @@ class IterativePennSAT():
         self.last_decision = root
         self.curr_direction = None
 
+        self.first = True
+
 
         # initialize clauses watching
         for claws in self.cnf:
@@ -121,13 +123,37 @@ class IterativePennSAT():
                     self.curr_child.left = new_node
                 self.curr_child = new_node
             self.curr_direction = 'Right'
+            print('NICO LOOK AT ME 3', self.value(literal))
 
             return False
         elif self.value(literal) is True:
             print(str(literal) + " was true")
 
             if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
-                new_node = Node('UP')
+                new_node = None
+                if self.first:
+                    new_node = Node('initial UP')
+                else:
+                    new_node = Node('UP')
+                new_node.decision_var = literal
+                if (self.curr_direction == 'Right'):
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
+                    
+                self.curr_child = new_node
+            print('NICO LOOK AT ME', self.value(literal))
+            self.curr_direction = 'Left'
+
+            return True
+        else:
+            
+            if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
+                new_node = None
+                if self.first:
+                    new_node = Node('initial UP')
+                else:
+                    new_node = Node('UP')
                 new_node.decision_var = literal
                 if (self.curr_direction == 'Right'):
                     self.curr_child.right = new_node
@@ -136,18 +162,7 @@ class IterativePennSAT():
                 self.curr_child = new_node
             self.curr_direction = 'Left'
 
-            return True
-        else:
-            
-            if (self.curr_child.decision_var != literal and self.curr_child.text != 'root'):
-                new_node = Node('UP')
-                new_node.decision_var = literal
-                if (self.curr_direction == 'Right'):
-                    self.curr_child.right = new_node
-                else:
-                    self.curr_child.left = new_node
-                self.curr_child = new_node
-            self.curr_direction = 'Left'
+            print('NICO LOOK AT ME 2', self.value(literal))
 
             self.assignment_stack[-1][abs(literal)] = bsign(literal, True)
             self.propagation_queue.append(literal * -1)
@@ -173,6 +188,16 @@ class IterativePennSAT():
             temp_index = original_totals.index(total)
             vars.append(temp_index)
             original_totals[temp_index] = -1
+        
+        for i in range(n+1):
+            found = False
+            for clause in cnf:
+                for variable in clause:
+                    if variable == i or abs(variable) == i:
+                        found = True
+            if not found and i in vars:
+                vars.remove(i)
+
         return vars
 
     def pick_variable(self) -> Optional[Var]:
@@ -235,6 +260,7 @@ class IterativePennSAT():
                 self.clauses_watching[false_literal].append(clause)
                 if self.assume(clause[0]) is False:
                     return False
+        
         return True
 
     def unit_propagate(self) -> bool:
@@ -261,21 +287,34 @@ class IterativePennSAT():
             # else:
             # if not abs(self.last_decision.decision_var) == abs(literal):
 
-
-            new_node = Node('UP')
-            new_node.decision_var = literal
-            if self.curr_direction == 'Right':
-                self.curr_child.right = new_node
-            else:
-                self.curr_child.left = new_node
+            if (self.curr_child.decision_var != literal):
+                new_node = None
+                if self.first:
+                    new_node = Node('initial UP')
+                else:
+                    new_node = Node('UP')
+                new_node.decision_var = literal
+                if self.curr_direction == 'Right':
+                    self.curr_child.right = new_node
+                else:
+                    self.curr_child.left = new_node
             
             # if self.value(literal):
             #     self.curr_direction = 'Left'
             # else:
-            if literal < 0:
-                self.curr_direction = "Right"
-            else:
-                self.curr_direction = "Left"
+            print('the sign', literal, self.assignment_stack[-1][abs(literal)])
+            # if self.assignment_stack[-1][abs(literal)] is False and literal > 0:
+            #     self.curr_direction = "Right"
+            # elif self.assignment_stack[-1][abs(literal)] is False and literal < 0:
+            #     self.curr_direction = "Left"
+            # elif self.assignment_stack[-1][abs(literal)] is True and literal > 0:
+            #     self.curr_direction = "Left"
+            # else:
+            #     self.curr_direction = "Right"
+            if self.value(literal) is False:
+                self.curr_direction = 'Right'
+            elif self.value(literal) is True:
+                self.curr_direction = 'Left'
             
             self.curr_child = new_node
 
@@ -323,23 +362,29 @@ class IterativePennSAT():
                     print("found unit clause: " + str(clause[0]))
                     if self.assume(clause[0]) is False:
                         return "UNSAT"
+                    
+                    if (self.curr_child.decision_var != clause[0]):
+                        new_node = None
+                        if self.first:
+                            new_node = Node('initial UP')
+                        else:
+                            new_node = Node('UP')
+                        new_node.decision_var = clause[0]
+                        if self.curr_direction == 'Right':
+                            self.curr_child.right = new_node
+                        else:
+                            self.curr_child.left = new_node
 
-                    new_node = Node('initial UP')
-                    new_node.decision_var = clause[0]
-                    if self.curr_direction == 'Right':
-                        self.curr_child.right = new_node
-                    else:
-                        self.curr_child.left = new_node
-
-                    if clause[0] < 0:
-                        self.curr_direction = 'Right'
-                    else:
-                        self.curr_direction = 'Left'
-                    self.curr_child = new_node
+                        if self.value(clause[0]) is False:
+                            self.curr_direction = 'Right'
+                        elif self.value(clause[0]) is True:
+                            self.curr_direction = 'Left'
+                        self.curr_child = new_node
                     
                     
             self.switch = -1
             self.next = 2
+            self.first = False
             #return 'image1'
 
         # for assignment in self.assignment_stack[-1]:
